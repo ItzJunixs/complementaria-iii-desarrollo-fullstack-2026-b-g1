@@ -1,0 +1,455 @@
+{
+  "info": {
+    "_postman_id": "90a14381-5f8f-54e2-8db3-240e44433c6a",
+    "name": "Biblioteca API - Actividad C2",
+    "description": "CRUD completo de /api/libros + casos de error 400, 404 y 409. Ejecutar con la API en localhost:8080 usando Run collection (en orden).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CRUD (casos exitosos)",
+      "item": [
+        {
+          "name": "1. POST crear libro - 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros"
+              ]
+            },
+            "description": "Crea un libro. Esperado 201 Created.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"El coronel no tiene quien le escriba\",\n  \"autor\": \"Gabriel García Márquez\",\n  \"isbn\": \"978-0060751562\",\n  \"anioPublicacion\": 1961,\n  \"disponible\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Devuelve id y Location\", function () {",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "    pm.response.to.have.header(\"Location\");",
+                  "});",
+                  "pm.collectionVariables.set(\"libroId\", json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. GET listar libros - 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros"
+              ]
+            },
+            "description": "Esperado 200 OK."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Es una lista\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").that.is.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. GET listar por autor - 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros?autor=garcía",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros"
+              ],
+              "query": [
+                {
+                  "key": "autor",
+                  "value": "garcía"
+                }
+              ]
+            },
+            "description": "Consulta por método findByAutorContainingIgnoreCase. Esperado 200 OK."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Todos son del autor\", function () { pm.response.json().forEach(l => pm.expect(l.autor.toLowerCase()).to.include(\"garcía\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. GET obtener libro por id - 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/{{libroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "{{libroId}}"
+              ]
+            },
+            "description": "Esperado 200 OK."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Es el libro creado\", function () { pm.expect(pm.response.json().isbn).to.eql(\"978-0060751562\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. PUT actualizar libro - 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/{{libroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "{{libroId}}"
+              ]
+            },
+            "description": "Esperado 200 OK.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"El coronel no tiene quien le escriba\",\n  \"autor\": \"Gabriel García Márquez\",\n  \"isbn\": \"978-0060751562\",\n  \"anioPublicacion\": 1961,\n  \"disponible\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Quedó no disponible\", function () { pm.expect(pm.response.json().disponible).to.eql(false); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. DELETE eliminar libro - 204",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/{{libroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "{{libroId}}"
+              ]
+            },
+            "description": "Esperado 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Casos de error",
+      "item": [
+        {
+          "name": "7. GET libro eliminado - 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/{{libroId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "{{libroId}}"
+              ]
+            },
+            "description": "El libro ya fue borrado. Esperado 404 Not Found."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Mensaje de no encontrado\", function () { pm.expect(pm.response.json().mensaje).to.include(\"No existe\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. GET id inexistente 9999 - 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "9999"
+              ]
+            },
+            "description": "Esperado 404 Not Found."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "9. POST datos inválidos - 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros"
+              ]
+            },
+            "description": "Título y autor vacíos, ISBN con letras, año inválido. Esperado 400 Bad Request.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"\",\n  \"autor\": \"\",\n  \"isbn\": \"ABC\",\n  \"anioPublicacion\": 3000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Indica los campos con error\", function () {",
+                  "    const campos = pm.response.json().campos;",
+                  "    pm.expect(campos).to.have.property(\"titulo\");",
+                  "    pm.expect(campos).to.have.property(\"isbn\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10. GET id con formato inválido - 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros",
+                "abc"
+              ]
+            },
+            "description": "El id debe ser numérico. Esperado 400 Bad Request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11. POST ISBN repetido - 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/libros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "libros"
+              ]
+            },
+            "description": "ISBN de 'Cien años de soledad' (dato inicial). Esperado 409 Conflict.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Copia\",\n  \"autor\": \"Anónimo\",\n  \"isbn\": \"978-0307474728\",\n  \"anioPublicacion\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "libroId",
+      "value": ""
+    }
+  ]
+}

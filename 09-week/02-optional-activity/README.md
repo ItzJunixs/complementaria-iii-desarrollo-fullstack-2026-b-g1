@@ -94,3 +94,9 @@ frontend muestre el mensaje correcto al usuario.
 ## Evidencia
 
 Capturas en `evidencias/` (ver `evidencias/README.md`).
+
+## Actividad calificable Corte 2
+
+La actividad calificable del corte 2 (API REST con Spring Boot, valor 5.0) está en
+[`c2-activity/`](c2-activity/): API de biblioteca (`/api/libros`) con CRUD JPA, Swagger, colección
+de Postman con casos de error y sección *API reference* en inglés.
