@@ -1,0 +1,43 @@
+### Archivo para el cliente HTTP de IntelliJ / VS Code (extensión REST Client)
+### Ejecutar en orden con la API corriendo.
+
+@baseUrl = http://localhost:8080
+
+### 1. Crear mascota -> 201
+POST {{baseUrl}}/api/mascotas
+Content-Type: application/json
+
+{
+  "nombre": "Toby",
+  "especie": "Perro",
+  "raza": "Beagle",
+  "edad": 2,
+  "nombreDueno": "Juan Diego Jiménez"
+}
+
+### 2. Listar mascotas -> 200
+GET {{baseUrl}}/api/mascotas
+
+### 3. Listar por especie -> 200
+GET {{baseUrl}}/api/mascotas?especie=perro
+
+### 4. Obtener mascota (id 4 = la creada, si la app se acaba de iniciar) -> 200
+GET {{baseUrl}}/api/mascotas/4
+
+### 5. Actualizar mascota -> 200
+PUT {{baseUrl}}/api/mascotas/4
+Content-Type: application/json
+
+{
+  "nombre": "Toby",
+  "especie": "Perro",
+  "raza": "Beagle mestizo",
+  "edad": 3,
+  "nombreDueno": "Juan Diego Jiménez"
+}
+
+### 6. Eliminar mascota -> 204
+DELETE {{baseUrl}}/api/mascotas/4
+
+### 7. Obtener mascota eliminada -> 404
+GET {{baseUrl}}/api/mascotas/4

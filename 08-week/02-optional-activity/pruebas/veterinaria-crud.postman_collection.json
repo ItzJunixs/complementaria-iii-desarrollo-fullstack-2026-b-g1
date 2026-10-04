@@ -1,0 +1,282 @@
+{
+  "info": {
+    "_postman_id": "8638474c-319d-55c9-ad5b-4906c3dda33c",
+    "name": "Veterinaria API - CRUD (semana 8)",
+    "description": "CRUD REST de mascotas. Ejecutar en orden (Runner) con la API corriendo en localhost:8080.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear mascota (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        },
+        "description": "Crea una mascota. Esperado: 201 Created + header Location.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Toby\",\n  \"especie\": \"Perro\",\n  \"raza\": \"Beagle\",\n  \"edad\": 2,\n  \"nombreDueno\": \"Juan Diego Jiménez\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test(\"Devuelve el id generado\", function () { pm.expect(json.id).to.be.a(\"number\"); });",
+              "pm.collectionVariables.set(\"mascotaId\", json.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Listar mascotas (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        },
+        "description": "Lista todas. Esperado: 200 OK."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Es una lista\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Listar por especie (GET ?especie)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas?especie=perro",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ],
+          "query": [
+            {
+              "key": "especie",
+              "value": "perro"
+            }
+          ]
+        },
+        "description": "Usa la consulta por método findByEspecieIgnoreCase. Esperado: 200 OK."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Solo perros\", function () { pm.response.json().forEach(m => pm.expect(m.especie.toLowerCase()).to.eql(\"perro\")); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Obtener mascota (GET /{id})",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/{{mascotaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "{{mascotaId}}"
+          ]
+        },
+        "description": "Obtiene la mascota creada. Esperado: 200 OK."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Es la mascota creada\", function () { pm.expect(pm.response.json().nombre).to.eql(\"Toby\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Actualizar mascota (PUT /{id})",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/{{mascotaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "{{mascotaId}}"
+          ]
+        },
+        "description": "Actualiza la mascota. Esperado: 200 OK.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Toby\",\n  \"especie\": \"Perro\",\n  \"raza\": \"Beagle mestizo\",\n  \"edad\": 3,\n  \"nombreDueno\": \"Juan Diego Jiménez\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Edad actualizada\", function () { pm.expect(pm.response.json().edad).to.eql(3); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Eliminar mascota (DELETE /{id})",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/{{mascotaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "{{mascotaId}}"
+          ]
+        },
+        "description": "Elimina la mascota. Esperado: 204 No Content."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 204\", function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Obtener mascota eliminada (GET /{id}) - 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/{{mascotaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "{{mascotaId}}"
+          ]
+        },
+        "description": "Comprueba que se borró. Esperado: 404 Not Found."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "mascotaId",
+      "value": ""
+    }
+  ]
+}
