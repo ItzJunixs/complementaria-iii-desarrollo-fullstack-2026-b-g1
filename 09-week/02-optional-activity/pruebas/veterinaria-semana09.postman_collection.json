@@ -1,0 +1,211 @@
+{
+  "info": {
+    "_postman_id": "9e7baa1e-aa44-5680-a6c8-3368593897b0",
+    "name": "Veterinaria API - Pruebas semana 9",
+    "description": "3 endpoints (POST, GET lista, GET por id) + 2 casos de error (404 y 400). API en localhost:8080.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear mascota (POST) - 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        },
+        "description": "Caso exitoso de creación. Esperado: 201 Created.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Toby\",\n  \"especie\": \"Perro\",\n  \"raza\": \"Beagle\",\n  \"edad\": 2,\n  \"nombreDueno\": \"Juan Diego Jiménez\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test(\"Header Location presente\", function () { pm.response.to.have.header(\"Location\"); });",
+              "pm.collectionVariables.set(\"mascotaId\", json.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Listar mascotas (GET) - 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        },
+        "description": "Caso exitoso de consulta. Esperado: 200 OK."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Es una lista con datos\", function () { pm.expect(pm.response.json()).to.be.an(\"array\").that.is.not.empty; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Obtener mascota existente (GET /{id}) - 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/{{mascotaId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "{{mascotaId}}"
+          ]
+        },
+        "description": "Obtiene la mascota recién creada. Esperado: 200 OK."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. ERROR - Obtener mascota inexistente (GET /9999) - 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas/9999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas",
+            "9999"
+          ]
+        },
+        "description": "Caso de error: id que no existe. Esperado: 404 Not Found."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "pm.test(\"Mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.include(\"9999\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. ERROR - Crear mascota inválida (POST) - 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/mascotas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        },
+        "description": "Caso de error: nombre vacío, edad negativa y sin dueño. Esperado: 400 Bad Request.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"especie\": \"Gato\",\n  \"edad\": -2,\n  \"nombreDueno\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Lista los campos con error\", function () { pm.expect(pm.response.json().campos).to.have.property(\"edad\"); });"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "mascotaId",
+      "value": ""
+    }
+  ]
+}
